@@ -5,15 +5,24 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 
-from .models import Location
-from .serializers import LocationSerializer
+from .models import Location, Parameter
+from .serializers import LocationSerializer, ParameterSerializer
+from .permissions import IsAuthenticatedAndOwner
 
 class LocationViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAuthenticated,)
     serializer_class = LocationSerializer
     """
-    A simple ViewSet for listing or retrieving locations.
+    A simple ViewSet for CRUD locations.
     """
+    def get_queryset(self):
+        """
+        Return a list of all the locations for the currently 
+        authenticated user.
+        """
+        user = self.request.user
+        return Location.objects.filter(owner=user)
+
     def list(self, request):
         queryset = Location.objects.filter(owner=request.user)
         serializer = LocationSerializer(queryset, many=True)
@@ -29,7 +38,26 @@ class LocationViewSet(viewsets.ModelViewSet):
         request.data['owner'] = request.user.id
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save(owner=request.user)
+        serializer.save()
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     
+
+class ParameterViewSet(viewsets.ModelViewSet):
+    permission_classes = (IsAuthenticatedAndOwner,)
+    serializer_class = ParameterSerializer
+    # """
+    # A simple ViewSet for CRUD location parameters.
+    # """
+    def get_queryset(self):
+        print(self.kwargs)
+        location = self.kwargs['location_id']
+        return Parameter.objects.filter(location=location)
+
+    def create(self, request, *args, **kwargs):
+        request.data['location'] = self.kwargs['location_id']
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
