@@ -50,25 +50,27 @@ class Parameter(models.Model):
         try:
             url = settings.EXTERNAL_API
             headers = settings.EXTERNAL_API_HEADERS
-            
-            epoch = int(time.mktime(datetime.datetime.now().timetuple()))
+            date = datetime.datetime.now() - datetime.timedelta(minutes=5)
+            epoch = int(time.mktime(date.timetuple()))
             querystring = {"lat":str(self.location.lat),"lon":str(self.location.lon),"dt":str(epoch)}
             
             #print(querystring)
             response = requests.request("GET", url, headers=headers, params=querystring)
             #print(response.text)
-            val = json.loads(response.text)
             s_val = []
-            for e in val['hourly']:
-                if self.api_id in e:
-                    # convert units
-                    conv_val = e[self.api_id]
-                    if self.api_id == 'temp':
-                        conv_val = round(convert_temperature(e[self.api_id], 'Kelvin', self.unit),2) 
+            if response.status_code == requests.codes.ok:
+                val = json.loads(response.text)
+                
+                for e in val['hourly']:
+                    if self.api_id in e:
+                        # convert units
+                        conv_val = e[self.api_id]
+                        if self.api_id == 'temp':
+                            conv_val = round(convert_temperature(e[self.api_id], 'Kelvin', self.unit),2) 
 
-                    # insert value in list
-                    s_val.append({'dt': e['dt'], 'value':conv_val})
-            return s_val
+                        # insert value in list
+                        s_val.append({'dt': e['dt'], 'value':conv_val})
+            return s_val 
         except Exception as e:
             print(e)
         return response.text
