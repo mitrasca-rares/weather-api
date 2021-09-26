@@ -149,4 +149,10 @@ SIMPLE_JWT = {
     'ROTATE_REFRESH_TOKENS': True,
 }
 
+EXTERNAL_API = "https://community-open-weather-map.p.rapidapi.com/onecall/timemachine"
+EXTERNAL_API_HEADERS = {
+            'x-rapidapi-host': "community-open-weather-map.p.rapidapi.com",
+            'x-rapidapi-key': "4cb839eba3msh9a32edf9f03618fp187530jsn58083d226dc1"
+            }
+
 django_heroku.settings(locals())

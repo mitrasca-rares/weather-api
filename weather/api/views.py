@@ -5,12 +5,14 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 
+import requests
+
 from .models import Location, Parameter
 from .serializers import LocationSerializer, ParameterSerializer
-from .permissions import IsAuthenticatedAndOwner
+from .permissions import IsAuthenticatedAndOwner, IsAuthenticatedAndLocationOwner
 
 class LocationViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticatedAndOwner,)
     serializer_class = LocationSerializer
     """
     A simple ViewSet for CRUD locations.
@@ -44,15 +46,15 @@ class LocationViewSet(viewsets.ModelViewSet):
     
 
 class ParameterViewSet(viewsets.ModelViewSet):
-    permission_classes = (IsAuthenticatedAndOwner,)
+    permission_classes = (IsAuthenticatedAndLocationOwner,)
     serializer_class = ParameterSerializer
-    # """
-    # A simple ViewSet for CRUD location parameters.
-    # """
+    """
+    A simple ViewSet for CRUD location parameters.
+    """
     def get_queryset(self):
         print(self.kwargs)
         location = self.kwargs['location_id']
-        return Parameter.objects.filter(location=location)
+        return Parameter.objects.filter(location=location, location__owner=self.request.user)
 
     def create(self, request, *args, **kwargs):
         request.data['location'] = self.kwargs['location_id']

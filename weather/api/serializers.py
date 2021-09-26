@@ -4,7 +4,7 @@ from .models import Location, Parameter
 class LocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Location
-        fields = ['id', 'description', 'owner']
+        fields = ['id', 'description', 'owner', 'aggregation']
         extra_kwargs = {
             'id': {'read_only': True},
             'owner': {'write_only': True},
