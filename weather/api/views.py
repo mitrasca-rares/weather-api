@@ -27,13 +27,13 @@ class LocationViewSet(viewsets.ModelViewSet):
 
     def list(self, request):
         queryset = Location.objects.filter(owner=request.user)
-        serializer = LocationSerializer(queryset, many=True)
+        serializer = LocationSerializer(queryset, many=True, context={'request': request})
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
         queryset = Location.objects.filter(owner=request.user)
         location = get_object_or_404(queryset, pk=pk)
-        serializer = LocationSerializer(location)
+        serializer = LocationSerializer(location, context={'request': request})
         return Response(serializer.data)
 
     def create(self, request, *args, **kwargs):
@@ -52,7 +52,6 @@ class ParameterViewSet(viewsets.ModelViewSet):
     A simple ViewSet for CRUD location parameters.
     """
     def get_queryset(self):
-        print(self.kwargs)
         location = self.kwargs['location_id']
         return Parameter.objects.filter(location=location, location__owner=self.request.user)
 
