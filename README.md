@@ -18,13 +18,13 @@ python manage.py runserver
 
 ```python
 Users
-'/api/auth/token/' (User login endpoint)
-'/api/auth/token-refresh/' (User token refresh endpoint)
+'/api/auth/token/$' (User login endpoint)
+'/api/auth/token-refresh/$' (User token refresh endpoint)
 
 Locations
-'/api/locations/$' (User location list endpoint),
-'/api/locations/{location-id}/$' (User location detail endpoint),
+'/api/locations/$' (User location list endpoint)
+'/api/locations/{location-id}/$' (User location detail endpoint)
 
 Parameters
-'/api/locations/{location-id}/parameters/$' (Location parameter list endpoint),
+'/api/locations/{location-id}/parameters/$' (Location parameter list endpoint)
 '/api/locations/{location-id}/parameters/{parameter-id}/$' (Location parameter detail endpoint)
